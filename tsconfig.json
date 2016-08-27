@@ -1,0 +1,17 @@
+{
+  "files": [
+    "typings/index.d.ts",
+    "definitions/dslink.d.ts",
+    "definitions/hap-nodejs.d.ts",
+    "lib/util.ts",
+    "lib/structure.ts",
+    "lib/store.ts",
+    "index.ts"
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "ES6",
+    "module": "commonjs",
+    "moduleResolution": "node"
+  }
+}

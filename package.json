@@ -1,0 +1,12 @@
+{
+  "name": "dslink-javascript-homekit",
+  "version": "1.0.0",
+  "description": "A DSLink for exposing a HomeKit accessory to the local network, ultimately to use Siri/HomeKit with DSA.",
+  "main": "dist/index.js",
+  "dependencies": {
+    "dslink": "^1.2.0",
+    "hap-nodejs": "^0.3.2"
+  },
+  "devDependencies": {
+  }
+}
