@@ -3,8 +3,8 @@ import HAP = require('hap-nodejs');
 
 export const defaultNodes: Object = {
   accessories: {
-    '$is': 'node',
-    '$name': 'Accessories'
+    $is: 'node',
+    $name: 'Accessories'
   },
   addAccessory: {
     $is: 'addAccessory',
@@ -52,21 +52,38 @@ export function accessoryStructure(displayName: string): any {
     $is: 'accessory',
     $name: displayName,
     $$uuid: HAP.uuid.generate(displayName),
+    services: {
+      $is: 'node',
+      $name: 'Services'
+    },
     remove: {
-      '$is': 'removeAccessory',
-      '$name': 'Remove Accessory',
-      '$invokable': 'write'
+      $is: 'remove',
+      $name: 'Remove Accessory',
+      $invokable: 'write'
     },
     addService: {
-      '$is': 'addService',
-      '$name': 'Add Service',
-      '$invokable': 'write'
+      $is: 'addService',
+      $name: 'Add Service',
+      $invokable: 'write',
+      $params: [
+        {
+          name: 'displayName',
+          type: 'string'
+        }
+      ]
     }
   };
 }
 
-/*
-export function serviceStructure() {
-  
+export function serviceStructure(displayName: string): any {
+  return {
+    $is: 'service',
+    $name: displayName,
+    $$uuid: HAP.uuid.generate(displayName),
+    remove: {
+      $is: 'remove',
+      $name: 'Remove Service',
+      $invokable: 'write'
+    }
+  };
 }
-*/

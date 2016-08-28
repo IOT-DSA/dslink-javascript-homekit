@@ -5,6 +5,7 @@ import structure = require('./structure');
 import util = require('./util');
 
 import accessory = require('./nodes/accessory');
+import service = require('./nodes/service');
 
 interface _State {
   link?: () => DS.LinkProvider;
@@ -21,6 +22,12 @@ store.when('link', () => {
     profiles: {
       accessory(path: string, provider: DS.SimpleNodeProvider) {
         return new accessory.AccessoryNode(path, provider);
+      },
+      service(path: string, provider: DS.SimpleNodeProvider) {
+        const parentPath = new DS.Path(path).parent.parentPath;
+
+        const a = (<accessory.AccessoryNode>provider.getNode(parentPath)).accessory;
+        return new service.ServiceNode(path, provider, a);
       },
       startBridge(path: string, provider?: DS.SimpleNodeProvider) {
         return new DS.SimpleActionNode(path, provider, _ => {
@@ -44,7 +51,16 @@ store.when('link', () => {
             structure.accessoryStructure(params.displayName));
         });
       },
-      removeAccessory(path: string, provider?: DS.SimpleNodeProvider) {
+      addService(path: string, provider?: DS.SimpleNodeProvider) {
+        return new DS.SimpleActionNode(path, provider, (params, node: DS.SimpleNode) => {
+          const parentPath = new DS.Path(path).parentPath;
+          const pathName = params.displayName.replace(/[\s\-\/]/g, "");
+          
+          node.provider.addNode(`${parentPath}/services/${pathName}`,
+            structure.serviceStructure(params.displayName));
+        });
+      },
+      remove(path: string, provider?: DS.SimpleNodeProvider) {
         return new DS.SimpleActionNode(path, provider, (params, node: DS.SimpleNode) => {
           node.parent.remove();
         });
