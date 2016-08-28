@@ -43,6 +43,10 @@ export class LifecycleStore<T extends Object> {
       
     return (this._state[name] = this._when[name]());
   }
+
+  has(name: string): boolean {
+    return !!this._state[name];
+  }
   
   deleteKey(name: string): void {
     if(this._whenDelete[name])

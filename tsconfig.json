@@ -3,8 +3,10 @@
     "typings/index.d.ts",
     "definitions/dslink.d.ts",
     "definitions/hap-nodejs.d.ts",
+    "lib/gen/types.ts",
     "lib/util.ts",
     "lib/structure.ts",
+    "lib/nodes/accessory.ts",
     "lib/store.ts",
     "index.ts"
   ],

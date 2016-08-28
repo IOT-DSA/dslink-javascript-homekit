@@ -1,9 +1,21 @@
+import DS = require('dslink');
+import HAP = require('hap-nodejs');
+
 export const defaultNodes: Object = {
-  services: {
-    
+  accessories: {
+    '$is': 'node',
+    '$name': 'Accessories'
   },
-  addService: {
-    
+  addAccessory: {
+    $is: 'addAccessory',
+    $name: 'Add Accessory',
+    $invokable: 'write',
+    $params: [
+      {
+        name: 'displayName',
+        type: 'string'
+      }
+    ]
   },
   name: {
     $is: 'node',
@@ -15,7 +27,7 @@ export const defaultNodes: Object = {
     $is: 'node',
     $name: 'Bridge Pincode',
     $type: 'string',
-    '?value': '123-45-678'
+    '?value': '465-46-465'
   },
   started: {
     $is: 'node',
@@ -34,3 +46,27 @@ export const defaultNodes: Object = {
     $invokable: 'write'
   }
 };
+
+export function accessoryStructure(displayName: string): any {
+  return {
+    $is: 'accessory',
+    $name: displayName,
+    $$uuid: HAP.uuid.generate(displayName),
+    remove: {
+      '$is': 'removeAccessory',
+      '$name': 'Remove Accessory',
+      '$invokable': 'write'
+    },
+    addService: {
+      '$is': 'addService',
+      '$name': 'Add Service',
+      '$invokable': 'write'
+    }
+  };
+}
+
+/*
+export function serviceStructure() {
+  
+}
+*/
