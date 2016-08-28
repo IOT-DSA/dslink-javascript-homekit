@@ -8,6 +8,7 @@
     "lib/structure.ts",
     "lib/nodes/accessory.ts",
     "lib/nodes/service.ts",
+    "lib/nodes/characteristic.ts",
     "lib/store.ts",
     "index.ts"
   ],
