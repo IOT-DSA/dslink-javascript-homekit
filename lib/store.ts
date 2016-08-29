@@ -28,12 +28,16 @@ store.when('link', () => {
         const parentPath = new DS.Path(path).parent.parentPath;
 
         const a = (<accessory.AccessoryNode>provider.getNode(parentPath)).accessory;
+        if (!a)
+          console.log('fuck');
         return new service.ServiceNode(path, provider, a);
       },
       characteristic(path: string, provider: DS.SimpleNodeProvider) {
         const parentPath = new DS.Path(path).parentPath;
 
         const s = (<service.ServiceNode>provider.getNode(parentPath)).service;
+        if (!s)
+          console.log('fuck');
         return new characteristic.CharacteristicNode(path, provider, s);
       },
       startBridge(path: string, provider?: DS.SimpleNodeProvider) {
@@ -65,6 +69,15 @@ store.when('link', () => {
           
           node.provider.addNode(`${parentPath}/services/${pathName}`,
             structure.serviceStructure(params.displayName));
+        });
+      },
+      addServicePrefab(path: string, provider?: DS.SimpleNodeProvider) {
+        return new DS.SimpleActionNode(path, provider, (params, node: DS.SimpleNode) => {
+          const parentPath = new DS.Path(path).parentPath;
+          const pathName = params.displayName.replace(/[\s\-\/]/g, "");
+          
+          node.provider.addNode(`${parentPath}/services/${pathName}`,
+            structure.servicePrefabStructure(params.displayName, params.type));
         });
       },
       addCharacteristic(path: string, provider?: DS.SimpleNodeProvider) {

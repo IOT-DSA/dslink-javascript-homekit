@@ -12,10 +12,10 @@ export class ServiceNode extends DS.SimpleNode {
   }
 
   load(map: any): any {
-    super.load(map);
-
     this.service = new HAP.Service(map.$name,
         map.$$uuid, map.$name);
+
+    super.load(map);
 
     if (this.accessory != null) {
       this.accessory.addService(this.service);

@@ -13,35 +13,61 @@ export class CharacteristicNode extends DS.SimpleNode {
 
   load(map: any): any {
     super.load(map);
+    
+    const validValues = map['?validValues'];
+    const writable = map['?writable'];
 
     this.characteristic = new HAP.Characteristic(map.$name, map.$$uuid, {
       format: HAP.Characteristic.Formats[map.$$format],
-      unit: HAP.Characteristic.Units[map.$$unit],
-      perms: map.$$writable ?
+      perms: (writable && Array.isArray(writable)) ? writable : (writable ?
         [HAP.Characteristic.Perms.READ, HAP.Characteristic.Perms.WRITE,
             HAP.Characteristic.Perms.NOTIFY] :
-        [HAP.Characteristic.Perms.READ, HAP.Characteristic.Perms.NOTIFY]
+        [HAP.Characteristic.Perms.READ, HAP.Characteristic.Perms.NOTIFY])
     });
+
+    if (map.$$unit) {
+      this.characteristic.setProps({ unit: map.$$unit });
+    }
 
     this.characteristic.setValue(map['?value'], null, null);
 
     this.subscribe(value => {
       try {
+        if (validValues != null) {
+          this.characteristic.setValue(validValues[value.value], null, null);
+          return;
+        }
+
         this.characteristic.setValue(value.value, null, null);
       } catch(e) {
         console.log(e);
       }
     });
 
-    if (map.$$writable) {
+    if (writable) {
       this.characteristic.on('change', change => {
-        if (this.value !== change.newValue) {
-          this.updateValue(change.newValue);
+        let value = change.newValue;
+
+        if (validValues != null) {
+          Object.keys(validValues).forEach(key => {
+            if (validValues[key] === value) {
+              value = key;
+            }
+          });
+        }
+
+        if (this.value !== value) {
+          this.updateValue(value);
         }
       });
     }
 
     if (this.service != null) {
+      if (map.$$prefab && map.removeCharacteristic) {
+        this.service.addOptionalCharacteristic(this.characteristic);
+        return;
+      }
+
       this.service.addCharacteristic(this.characteristic);
     }
   }
