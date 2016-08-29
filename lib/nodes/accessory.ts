@@ -11,10 +11,10 @@ export class AccessoryNode extends DS.SimpleNode {
   }
 
   load(map: any): any {
-    super.load(map);
-
     store.accessories.push((this.accessory = new HAP.Accessory(map.$name, map.$$uuid)));
-
+    
+    super.load(map);
+    
     if (store.store.has('bridge')) {
       store.store.state.bridge().addBridgedAccessory(this.accessory, false);
     }

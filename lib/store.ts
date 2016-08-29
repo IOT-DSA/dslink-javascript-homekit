@@ -28,16 +28,12 @@ store.when('link', () => {
         const parentPath = new DS.Path(path).parent.parentPath;
 
         const a = (<accessory.AccessoryNode>provider.getNode(parentPath)).accessory;
-        if (!a)
-          console.log('fuck');
         return new service.ServiceNode(path, provider, a);
       },
       characteristic(path: string, provider: DS.SimpleNodeProvider) {
         const parentPath = new DS.Path(path).parentPath;
 
         const s = (<service.ServiceNode>provider.getNode(parentPath)).service;
-        if (!s)
-          console.log('fuck');
         return new characteristic.CharacteristicNode(path, provider, s);
       },
       startBridge(path: string, provider?: DS.SimpleNodeProvider) {
