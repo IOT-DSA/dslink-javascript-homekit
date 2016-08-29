@@ -73,7 +73,7 @@ store.when('link', () => {
           const pathName = params.displayName.replace(/[\s\-\/]/g, "");
           
           node.provider.addNode(`${parentPath}/services/${pathName}`,
-            structure.servicePrefabStructure(params.displayName, params.type));
+            structure.servicePrefabStructure(params.displayName, params.type, params.includeOptionalCharacteristics));
         });
       },
       addCharacteristic(path: string, provider?: DS.SimpleNodeProvider) {

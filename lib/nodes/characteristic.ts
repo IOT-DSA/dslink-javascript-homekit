@@ -13,6 +13,14 @@ export class CharacteristicNode extends DS.SimpleNode {
 
   load(map: any): any {
     super.load(map);
+
+    const convert = (type: string): any => {
+      if (map.$$type === 'int' || map.$$type === 'number')
+        return parseFloat(type);
+      if (map.$$type === 'bool')
+        return type === 'type';
+      return type;
+    };
     
     const validValues = map['?validValues'];
     const writable = map['?writable'];
@@ -33,16 +41,17 @@ export class CharacteristicNode extends DS.SimpleNode {
       this.characteristic.setProps({ unit: map.$$unit });
     }
 
-    this.characteristic.setValue(map['?value'], null, null);
+    this.characteristic.getDefaultValue();
 
     this.subscribe(value => {
       try {
         if (validValues != null) {
-          this.characteristic.setValue(validValues[value.value], null, null);
+          const val = convert(validValues[value.value]);
+          this.characteristic.setValue(val, null, null);
           return;
         }
 
-        this.characteristic.setValue(value.value, null, null);
+        this.characteristic.setValue(convert(value.value), null, null);
       } catch(e) {
         console.log(e);
       }
@@ -53,7 +62,7 @@ export class CharacteristicNode extends DS.SimpleNode {
 
       if (validValues != null) {
         Object.keys(validValues).forEach(key => {
-          if (validValues[key] === value) {
+          if (validValues[key] === value.toString()) {
             value = key;
           }
         });

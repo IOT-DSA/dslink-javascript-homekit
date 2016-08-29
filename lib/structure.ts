@@ -121,6 +121,11 @@ export function accessoryStructure(displayName: string): any {
         {
           name: 'type',
           type: enumPrefabServices
+        },
+        {
+          name: 'includeOptionalCharacteristics',
+          type: 'bool',
+          default: true
         }
       ]
     },
@@ -189,6 +194,7 @@ export function characteristicStructure(displayName: string, format: string, uni
     $$format: format,
     $$unit: unit,
     $type: dsaFormat,
+    $$type: dsaFormat,
     $writable: 'write',
     '?value': defaultValues[dsaFormat] != null ? defaultValues[dsaFormat] : '',
     '?writable': writable,
@@ -277,17 +283,18 @@ export function characteristicPrefabStructure(prefab: _CharacteristicPrefab, isR
     const e = Object.keys(prefab.validValues);
     Object.assign(map, {
       $type: DS.buildEnumType(e),
-      '?value': e[0],
+      $$type: dsaFormat,
       '?validValues': prefab.validValues
     });
   } else {
     map.$type = dsaFormat;
+    map.$$type = dsaFormat;
     map['?value'] = defaultValues[dsaFormat] != null ? defaultValues[dsaFormat] : '';
   }
 
   if (prefab.unit != null) {
     Object.assign(map, {
-      $$uuid: prefab.unit,
+      $$unit: prefab.unit,
       unit: {
         $is: 'node',
         $name: 'Unit',
@@ -346,7 +353,7 @@ interface _ServicePrefab {
   optional: string[];
 }
 
-export function servicePrefabStructure(displayName: string, type: string): any {
+export function servicePrefabStructure(displayName: string, type: string, includeOptionalCharacteristics: boolean): any {
   const prefab: _ServicePrefab = types.types.services[type];
 
   var map: any = {
@@ -391,11 +398,13 @@ export function servicePrefabStructure(displayName: string, type: string): any {
     map[`_${cPrefab.name}`] = characteristicPrefabStructure(cPrefab, true);
   });
 
-  prefab.optional.forEach(name => {
-    const cPrefab: _CharacteristicPrefab = types.types.characteristics[name];
+  if (includeOptionalCharacteristics) {
+    prefab.optional.forEach(name => {
+      const cPrefab: _CharacteristicPrefab = types.types.characteristics[name];
     
-    map[`_${cPrefab.name}`] = characteristicPrefabStructure(cPrefab, false);
-  });
+      map[`_${cPrefab.name}`] = characteristicPrefabStructure(cPrefab, false);
+    });
+  }
 
   return map;
 }
