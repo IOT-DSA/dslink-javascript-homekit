@@ -358,11 +358,6 @@ export function servicePrefabStructure(displayName: string, type: string): any {
       $name: 'Remove Service',
       $invokable: 'write'
     },
-    prefab: {
-      $is: 'node',
-      $type: 'string',
-      '?value': type
-    },
     addCharacteristic: {
       $is: 'addCharacteristic',
       $name: 'Add Characteristic',

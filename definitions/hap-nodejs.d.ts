@@ -73,6 +73,7 @@ declare namespace __Hap {
     UUID: string;
     
     value: any;
+    props: _CharacteristicProps;
 
     constructor(displayName: string, UUID: string, props?: _CharacteristicProps);
 

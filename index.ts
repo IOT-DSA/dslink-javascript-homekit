@@ -7,7 +7,13 @@ const state = store.store.state;
 
 const link: DS.LinkProvider = state.link();
 
-link.connect().then(() => {
+link.init();
+
+link.connect().then(_ => {
   HAP.init();
   state.bridge();
+  
+  setInterval(_ => {
+    link.save();
+  }, 1000 * 2.5);
 });

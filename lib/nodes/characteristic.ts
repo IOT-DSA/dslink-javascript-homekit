@@ -19,10 +19,14 @@ export class CharacteristicNode extends DS.SimpleNode {
 
     this.characteristic = new HAP.Characteristic(map.$name, map.$$uuid, {
       format: HAP.Characteristic.Formats[map.$$format],
-      perms: (writable && Array.isArray(writable)) ? writable : (writable ?
+      perms: !!map.$$perms ? map.$$perms : ((writable && Array.isArray(writable)) ? writable : (writable ?
         [HAP.Characteristic.Perms.READ, HAP.Characteristic.Perms.WRITE,
             HAP.Characteristic.Perms.NOTIFY] :
-        [HAP.Characteristic.Perms.READ, HAP.Characteristic.Perms.NOTIFY])
+        [HAP.Characteristic.Perms.READ, HAP.Characteristic.Perms.NOTIFY]))
+    });
+
+    this.configs = Object.assign(this.configs, {
+      $$perms: this.characteristic.props.perms
     });
 
     if (map.$$unit) {
@@ -44,23 +48,21 @@ export class CharacteristicNode extends DS.SimpleNode {
       }
     });
 
-    if (writable) {
-      this.characteristic.on('change', change => {
-        let value = change.newValue;
+    this.characteristic.on('change', change => {
+      let value = change.newValue;
 
-        if (validValues != null) {
-          Object.keys(validValues).forEach(key => {
-            if (validValues[key] === value) {
-              value = key;
-            }
-          });
-        }
+      if (validValues != null) {
+        Object.keys(validValues).forEach(key => {
+          if (validValues[key] === value) {
+            value = key;
+          }
+        });
+      }
 
-        if (this.value !== value) {
-          this.updateValue(value);
-        }
-      });
-    }
+      if (this.value !== value) {
+        this.updateValue(value);
+      }
+    });
 
     if (this.service != null) {
       if (map.$$prefab && map.removeCharacteristic) {
