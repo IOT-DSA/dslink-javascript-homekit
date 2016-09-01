@@ -33,6 +33,8 @@ export class CharacteristicNode extends DS.SimpleNode {
         [HAP.Characteristic.Perms.READ, HAP.Characteristic.Perms.NOTIFY]))
     });
 
+    this.characteristic.value = this.characteristic.getDefaultValue();
+
     this.configs = Object.assign(this.configs, {
       $$perms: this.characteristic.props.perms
     });
@@ -40,8 +42,6 @@ export class CharacteristicNode extends DS.SimpleNode {
     if (map.$$unit) {
       this.characteristic.setProps({ unit: map.$$unit });
     }
-
-    this.characteristic.getDefaultValue();
 
     this.subscribe(value => {
       try {

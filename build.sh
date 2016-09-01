@@ -7,4 +7,4 @@
 #
 # To enable this hook, rename this file to "pre-commit".
 
-tsc -p .
+./node_modules/typescript/bin/tsc -p .

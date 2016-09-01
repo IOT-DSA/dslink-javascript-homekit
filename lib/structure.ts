@@ -102,11 +102,6 @@ export function accessoryStructure(displayName: string): any {
       $is: 'node',
       $name: 'Services'
     },
-    remove: {
-      $is: 'remove',
-      $name: 'Remove Accessory',
-      $invokable: 'write'
-    },
     addServicePrefab: {
       $is: 'addServicePrefab',
       $name: 'Add Service Prefab',
@@ -141,6 +136,11 @@ export function accessoryStructure(displayName: string): any {
           type: 'string'
         }
       ]
+    },
+    remove: {
+      $is: 'remove',
+      $name: 'Remove Accessory',
+      $invokable: 'write'
     }
   };
 }
@@ -270,7 +270,7 @@ export function characteristicPrefabStructure(prefab: _CharacteristicPrefab, isR
     $$format: format,
     $$prefab: 'true',
     $writable: 'write',
-    '?writable': perms.map(p => HAP.Characteristic.Perms[p]),
+    '?writable': perms.filter(p => !!p).map(p => HAP.Characteristic.Perms[p]),
     format: {
       $is: 'node',
       $name: 'Format',
