@@ -33,5 +33,4 @@ node_modules
 nodes.json
 
 typings
-dist
 persist
