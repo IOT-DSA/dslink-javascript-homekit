@@ -1,8 +1,9 @@
 "use strict";
-const DS = require('dslink');
-const HAP = require('hap-nodejs');
-const types = require('./gen/types');
-const enumFormats = DS.buildEnumType([
+var DS = require('dslink');
+var HAP = require('hap-nodejs');
+var types = require('./gen/types');
+var util = require('./util');
+var enumFormats = DS.buildEnumType([
     'BOOL',
     'INT',
     'FLOAT',
@@ -12,7 +13,7 @@ const enumFormats = DS.buildEnumType([
     'UINT32',
     'UINT64',
 ]);
-const hapToDSAFormats = {
+var hapToDSAFormats = {
     'INT': 'int',
     'UINT8': 'int',
     'UINT16': 'int',
@@ -22,13 +23,13 @@ const hapToDSAFormats = {
     'FLOAT': 'number',
     'STRING': 'string'
 };
-const defaultValues = {
+var defaultValues = {
     'int': 0,
     'number': 0,
     'bool': false,
     'string': ''
 };
-const enumUnits = DS.buildEnumType([
+var enumUnits = DS.buildEnumType([
     'NONE',
     'CELSIUS',
     'PERCENTAGE',
@@ -36,7 +37,7 @@ const enumUnits = DS.buildEnumType([
     'LUX',
     'SECONDS'
 ]);
-const enumPrefabServices = DS.buildEnumType(Object.keys(types.types.services).filter(t => t.toLowerCase().indexOf('bridg') < 0 && t.toLowerCase().indexOf('tunnel') < 0));
+var enumPrefabServices = DS.buildEnumType(Object.keys(types.types.services).filter(function (t) { return t.toLowerCase().indexOf('bridg') < 0 && t.toLowerCase().indexOf('tunnel') < 0; }));
 exports.defaultNodes = {
     accessories: {
         $is: 'node',
@@ -175,8 +176,8 @@ function serviceStructure(displayName) {
 }
 exports.serviceStructure = serviceStructure;
 function characteristicStructure(displayName, format, unit, writable) {
-    const dsaFormat = hapToDSAFormats[format] || 'dynamic';
-    const map = {
+    var dsaFormat = hapToDSAFormats[format] || 'dynamic';
+    var map = {
         $is: 'characteristic',
         $name: displayName,
         $$uuid: HAP.uuid.generate(displayName),
@@ -206,7 +207,7 @@ function characteristicStructure(displayName, format, unit, writable) {
         }
     };
     if (dsaFormat === 'number' || dsaFormat === 'int') {
-        Object.assign(map, {
+        util.assign(map, {
             addBounds: {
                 $is: 'addBounds',
                 $name: 'Add Bounds',
@@ -232,17 +233,17 @@ function characteristicStructure(displayName, format, unit, writable) {
 }
 exports.characteristicStructure = characteristicStructure;
 function characteristicPrefabStructure(prefab, isRequired) {
-    const { uuid, prettyName, format, perms } = prefab;
-    const dsaFormat = hapToDSAFormats[format] || 'dynamic';
-    const isEnum = prefab.validValues != null;
-    const map = {
+    var uuid = prefab.uuid, prettyName = prefab.prettyName, format = prefab.format, perms = prefab.perms;
+    var dsaFormat = hapToDSAFormats[format] || 'dynamic';
+    var isEnum = prefab.validValues != null;
+    var map = {
         $is: 'characteristic',
         $name: prettyName,
         $$uuid: uuid,
         $$format: format,
         $$prefab: 'true',
         $writable: 'write',
-        '?writable': perms.filter(p => !!p).map(p => HAP.Characteristic.Perms[p]),
+        '?writable': perms.filter(function (p) { return !!p; }).map(function (p) { return HAP.Characteristic.Perms[p]; }),
         format: {
             $is: 'node',
             $name: 'Format',
@@ -251,8 +252,8 @@ function characteristicPrefabStructure(prefab, isRequired) {
         }
     };
     if (isEnum) {
-        const e = Object.keys(prefab.validValues);
-        Object.assign(map, {
+        var e = Object.keys(prefab.validValues);
+        util.assign(map, {
             $type: DS.buildEnumType(e),
             $$type: dsaFormat,
             '?validValues': prefab.validValues
@@ -264,7 +265,7 @@ function characteristicPrefabStructure(prefab, isRequired) {
         map['?value'] = defaultValues[dsaFormat] != null ? defaultValues[dsaFormat] : '';
     }
     if (prefab.unit != null) {
-        Object.assign(map, {
+        util.assign(map, {
             $$unit: prefab.unit,
             unit: {
                 $is: 'node',
@@ -312,7 +313,7 @@ function characteristicPrefabStructure(prefab, isRequired) {
 }
 exports.characteristicPrefabStructure = characteristicPrefabStructure;
 function servicePrefabStructure(displayName, type, includeOptionalCharacteristics) {
-    const prefab = types.types.services[type];
+    var prefab = types.types.services[type];
     var map = {
         $is: 'service',
         $name: displayName,
@@ -348,14 +349,14 @@ function servicePrefabStructure(displayName, type, includeOptionalCharacteristic
             ]
         }
     };
-    prefab.required.forEach(name => {
-        const cPrefab = types.types.characteristics[name];
-        map[`_${cPrefab.name}`] = characteristicPrefabStructure(cPrefab, true);
+    prefab.required.forEach(function (name) {
+        var cPrefab = types.types.characteristics[name];
+        map[("_" + cPrefab.name)] = characteristicPrefabStructure(cPrefab, true);
     });
     if (includeOptionalCharacteristics) {
-        prefab.optional.forEach(name => {
-            const cPrefab = types.types.characteristics[name];
-            map[`_${cPrefab.name}`] = characteristicPrefabStructure(cPrefab, false);
+        prefab.optional.forEach(function (name) {
+            var cPrefab = types.types.characteristics[name];
+            map[("_" + cPrefab.name)] = characteristicPrefabStructure(cPrefab, false);
         });
     }
     return map;

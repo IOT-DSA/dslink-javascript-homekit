@@ -1,84 +1,84 @@
 "use strict";
-const DS = require('dslink');
-const HAP = require('hap-nodejs');
-const structure = require('./structure');
-const util = require('./util');
-const accessory = require('./nodes/accessory');
-const service = require('./nodes/service');
-const characteristic = require('./nodes/characteristic');
+var DS = require('dslink');
+var HAP = require('hap-nodejs');
+var structure = require('./structure');
+var util = require('./util');
+var accessory = require('./nodes/accessory');
+var service = require('./nodes/service');
+var characteristic = require('./nodes/characteristic');
 exports.accessories = [];
 exports.store = new util.LifecycleStore();
-exports.store.when('link', () => {
-    const link = new DS.LinkProvider(process.argv.slice(2), 'HomeKit-', {
+exports.store.when('link', function () {
+    var link = new DS.LinkProvider(process.argv.slice(2), 'HomeKit-', {
         defaultNodes: structure.defaultNodes,
         profiles: {
-            accessory(path, provider) {
+            accessory: function (path, provider) {
                 return new accessory.AccessoryNode(path, provider);
             },
-            service(path, provider) {
-                const parentPath = new DS.Path(path).parent.parentPath;
-                const a = provider.getNode(parentPath).accessory;
+            service: function (path, provider) {
+                var parentPath = new DS.Path(path).parent.parentPath;
+                var a = provider.getNode(parentPath).accessory;
                 return new service.ServiceNode(path, provider, a);
             },
-            characteristic(path, provider) {
-                const parentPath = new DS.Path(path).parentPath;
-                const s = provider.getNode(parentPath).service;
+            characteristic: function (path, provider) {
+                var parentPath = new DS.Path(path).parentPath;
+                var s = provider.getNode(parentPath).service;
                 return new characteristic.CharacteristicNode(path, provider, s);
             },
-            startBridge(path, provider) {
-                return new DS.SimpleActionNode(path, provider, _ => {
+            startBridge: function (path, provider) {
+                return new DS.SimpleActionNode(path, provider, function (_) {
                     if (link.val('/started'))
                         return;
                     exports.store.state.bridge();
                 });
             },
-            stopBridge(path, provider) {
-                return new DS.SimpleActionNode(path, provider, _ => {
+            stopBridge: function (path, provider) {
+                return new DS.SimpleActionNode(path, provider, function (_) {
                     if (!link.val('/started'))
                         return;
                     exports.store.deleteKey('bridge');
                 });
             },
-            addAccessory(path, provider) {
-                return new DS.SimpleActionNode(path, provider, (params, node) => {
-                    const pathName = params.displayName.replace(/[\s\-\/]/g, "");
-                    node.provider.addNode(`/accessories/${pathName}`, structure.accessoryStructure(params.displayName));
+            addAccessory: function (path, provider) {
+                return new DS.SimpleActionNode(path, provider, function (params, node) {
+                    var pathName = params.displayName.replace(/[\s\-\/]/g, "");
+                    node.provider.addNode("/accessories/" + pathName, structure.accessoryStructure(params.displayName));
                 });
             },
-            addService(path, provider) {
-                return new DS.SimpleActionNode(path, provider, (params, node) => {
-                    const parentPath = new DS.Path(path).parentPath;
-                    const pathName = params.displayName.replace(/[\s\-\/]/g, "");
-                    node.provider.addNode(`${parentPath}/services/${pathName}`, structure.serviceStructure(params.displayName));
+            addService: function (path, provider) {
+                return new DS.SimpleActionNode(path, provider, function (params, node) {
+                    var parentPath = new DS.Path(path).parentPath;
+                    var pathName = params.displayName.replace(/[\s\-\/]/g, "");
+                    node.provider.addNode(parentPath + "/services/" + pathName, structure.serviceStructure(params.displayName));
                 });
             },
-            addServicePrefab(path, provider) {
-                return new DS.SimpleActionNode(path, provider, (params, node) => {
-                    const parentPath = new DS.Path(path).parentPath;
-                    const pathName = params.displayName.replace(/[\s\-\/]/g, "");
-                    node.provider.addNode(`${parentPath}/services/${pathName}`, structure.servicePrefabStructure(params.displayName, params.type, params.includeOptionalCharacteristics));
+            addServicePrefab: function (path, provider) {
+                return new DS.SimpleActionNode(path, provider, function (params, node) {
+                    var parentPath = new DS.Path(path).parentPath;
+                    var pathName = params.displayName.replace(/[\s\-\/]/g, "");
+                    node.provider.addNode(parentPath + "/services/" + pathName, structure.servicePrefabStructure(params.displayName, params.type, params.includeOptionalCharacteristics));
                 });
             },
-            addCharacteristic(path, provider) {
-                return new DS.SimpleActionNode(path, provider, (params, node) => {
-                    const parentPath = new DS.Path(path).parentPath;
-                    const pathName = params.name.replace(/[\s\-\/]/g, "");
-                    const { name, format, unit, writable } = params;
-                    node.provider.addNode(`${parentPath}/_${pathName}`, structure.characteristicStructure(name, format, unit, writable));
+            addCharacteristic: function (path, provider) {
+                return new DS.SimpleActionNode(path, provider, function (params, node) {
+                    var parentPath = new DS.Path(path).parentPath;
+                    var pathName = params.name.replace(/[\s\-\/]/g, "");
+                    var name = params.name, format = params.format, unit = params.unit, writable = params.writable;
+                    node.provider.addNode(parentPath + "/_" + pathName, structure.characteristicStructure(name, format, unit, writable));
                 });
             },
-            addBounds(path, provider) {
-                const parentPath = new DS.Path(path).parentPath;
-                const c = provider.getNode(parentPath);
-                return new DS.SimpleActionNode(path, provider, (params, node) => {
+            addBounds: function (path, provider) {
+                var parentPath = new DS.Path(path).parentPath;
+                var c = provider.getNode(parentPath);
+                return new DS.SimpleActionNode(path, provider, function (params, node) {
                     if (c.hasBounds())
                         return;
-                    const { minValue, maxValue, minStep } = params;
+                    var minValue = params.minValue, maxValue = params.maxValue, minStep = params.minStep;
                     c.addBounds(minValue, maxValue, minStep);
                 });
             },
-            remove(path, provider) {
-                return new DS.SimpleActionNode(path, provider, (params, node) => {
+            remove: function (path, provider) {
+                return new DS.SimpleActionNode(path, provider, function (params, node) {
                     node.parent.remove();
                 });
             }
@@ -86,10 +86,10 @@ exports.store.when('link', () => {
     });
     return link;
 });
-exports.store.when('bridge', () => {
-    const link = exports.store.state.link();
-    const name = link.val('/name');
-    const bridge = new HAP.Bridge(name, HAP.uuid.generate(name));
+exports.store.when('bridge', function () {
+    var link = exports.store.state.link();
+    var name = link.val('/name');
+    var bridge = new HAP.Bridge(name, HAP.uuid.generate(name));
     console.log(link.val('/pincode'));
     bridge.publish({
         username: 'DC:FE:BA:AB:3F:27',
@@ -101,7 +101,7 @@ exports.store.when('bridge', () => {
     link.val('/started', true);
     return bridge;
 });
-exports.store.whenDelete('bridge', (bridge) => {
+exports.store.whenDelete('bridge', function (bridge) {
     util.unpublishAccessory(bridge);
     exports.store.state.link().val('/started', false);
 });

@@ -2,6 +2,7 @@ import DS = require('dslink');
 import HAP = require('hap-nodejs');
 
 import types = require('./gen/types');
+import util = require('./util');
 
 const enumFormats = DS.buildEnumType([
   'BOOL',
@@ -218,7 +219,7 @@ export function characteristicStructure(displayName: string, format: string, uni
   }; 
 
   if (dsaFormat === 'number' || dsaFormat === 'int') {
-    Object.assign(map, {
+    util.assign(map, {
       addBounds: {
         $is: 'addBounds',
         $name: 'Add Bounds',
@@ -281,7 +282,7 @@ export function characteristicPrefabStructure(prefab: _CharacteristicPrefab, isR
 
   if (isEnum) {
     const e = Object.keys(prefab.validValues);
-    Object.assign(map, {
+    util.assign(map, {
       $type: DS.buildEnumType(e),
       $$type: dsaFormat,
       '?validValues': prefab.validValues
@@ -293,7 +294,7 @@ export function characteristicPrefabStructure(prefab: _CharacteristicPrefab, isR
   }
 
   if (prefab.unit != null) {
-    Object.assign(map, {
+    util.assign(map, {
       $$unit: prefab.unit,
       unit: {
         $is: 'node',

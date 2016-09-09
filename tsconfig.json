@@ -14,7 +14,7 @@
   ],
   "compilerOptions": {
     "outDir": "dist",
-    "target": "ES6",
+    "target": "ES5",
     "module": "commonjs",
     "moduleResolution": "node"
   }

@@ -11,6 +11,23 @@ export function unpublishAccessory(acc: any): void {
   acc._server = null;
 }
 
+export function assign(dest, ...args) {
+  var count = 0;
+  var length = args.length;
+
+  for(; count < length; count++) {
+    var arg = args[count];
+
+    for(var prop in arg) {
+      if(arg.hasOwnProperty(prop)) {
+        dest[prop] = arg[prop];
+      }
+    }
+  }
+
+  return dest;
+}
+
 export class LifecycleStore<T extends Object> {
   _state: Object;
   state: T;

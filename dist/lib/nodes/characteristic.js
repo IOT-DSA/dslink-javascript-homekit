@@ -1,22 +1,30 @@
 "use strict";
-const DS = require('dslink');
-const HAP = require('hap-nodejs');
-class CharacteristicNode extends DS.SimpleNode {
-    constructor(path, provider, service) {
-        super(path, provider);
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var DS = require('dslink');
+var HAP = require('hap-nodejs');
+var util = require('../util');
+var CharacteristicNode = (function (_super) {
+    __extends(CharacteristicNode, _super);
+    function CharacteristicNode(path, provider, service) {
+        _super.call(this, path, provider);
         this.service = service;
     }
-    load(map) {
-        super.load(map);
-        const convert = (type) => {
+    CharacteristicNode.prototype.load = function (map) {
+        var _this = this;
+        _super.prototype.load.call(this, map);
+        var convert = function (type) {
             if (map.$$type === 'int' || map.$$type === 'number')
                 return parseFloat(type);
             if (map.$$type === 'bool')
                 return type === 'type';
             return type;
         };
-        const validValues = map['?validValues'];
-        const writable = map['?writable'];
+        var validValues = map['?validValues'];
+        var writable = map['?writable'];
         this.characteristic = new HAP.Characteristic(map.$name, map.$$uuid, {
             format: HAP.Characteristic.Formats[map.$$format],
             perms: !!map.$$perms ? map.$$perms : ((writable && Array.isArray(writable)) ? writable : (writable ?
@@ -25,36 +33,36 @@ class CharacteristicNode extends DS.SimpleNode {
                 [HAP.Characteristic.Perms.READ, HAP.Characteristic.Perms.NOTIFY]))
         });
         this.characteristic.value = this.characteristic.getDefaultValue();
-        this.configs = Object.assign(this.configs, {
+        this.configs = util.assign(this.configs, {
             $$perms: this.characteristic.props.perms
         });
         if (map.$$unit) {
             this.characteristic.setProps({ unit: map.$$unit });
         }
-        this.subscribe(value => {
+        this.subscribe(function (value) {
             try {
                 if (validValues != null) {
-                    const val = convert(validValues[value.value]);
-                    this.characteristic.setValue(val, null, null);
+                    var val = convert(validValues[value.value]);
+                    _this.characteristic.setValue(val, null, null);
                     return;
                 }
-                this.characteristic.setValue(convert(value.value), null, null);
+                _this.characteristic.setValue(convert(value.value), null, null);
             }
             catch (e) {
                 console.log(e);
             }
         });
-        this.characteristic.on('change', change => {
-            let value = change.newValue;
+        this.characteristic.on('change', function (change) {
+            var value = change.newValue;
             if (validValues != null) {
-                Object.keys(validValues).forEach(key => {
-                    if (validValues[key] === value.toString()) {
+                Object.keys(validValues).forEach(function (key) {
+                    if (validValues[key].toString() === value.toString()) {
                         value = key;
                     }
                 });
             }
-            if (this.value !== value) {
-                this.updateValue(value);
+            if (_this.value !== value) {
+                _this.updateValue(value);
             }
         });
         if (this.service != null) {
@@ -64,52 +72,54 @@ class CharacteristicNode extends DS.SimpleNode {
             }
             this.service.addCharacteristic(this.characteristic);
         }
-    }
-    onRemoving() {
+    };
+    CharacteristicNode.prototype.onRemoving = function () {
         if (this.service != null && this.characteristic != null) {
             this.service.removeCharacteristic(this.characteristic);
             this.characteristic.removeAllListeners('change');
             this.service = null;
             this.characteristic = null;
         }
-        super.onRemoving();
-    }
-    hasBounds() {
+        _super.prototype.onRemoving.call(this);
+    };
+    CharacteristicNode.prototype.hasBounds = function () {
         return Object.keys(this.children).indexOf('minValue') != -1;
-    }
-    addBounds(minValue, maxValue, minStep) {
-        this.provider.addNode(`${this.path}/minValue`, {
+    };
+    CharacteristicNode.prototype.addBounds = function (minValue, maxValue, minStep) {
+        var _this = this;
+        this.provider.addNode(this.path + "/minValue", {
             $name: 'Minimum Value',
             $type: 'number',
             $writable: 'write',
             '?value': minValue
         });
-        this.children['minValue'].subscribe(value => {
-            this.characteristic.setProps({ minValue: value.value });
+        this.children['minValue'].subscribe(function (value) {
+            _this.characteristic.setProps({ minValue: value.value });
         });
-        this.provider.addNode(`${this.path}/maxValue`, {
+        this.provider.addNode(this.path + "/maxValue", {
             $name: 'Maximum Value',
             $type: 'number',
             $writable: 'write',
             '?value': maxValue
         });
-        this.children['maxValue'].subscribe(value => {
-            this.characteristic.setProps({ maxValue: value.value });
+        this.children['maxValue'].subscribe(function (value) {
+            _this.characteristic.setProps({ maxValue: value.value });
         });
-        this.provider.addNode(`${this.path}/minStep`, {
+        this.provider.addNode(this.path + "/minStep", {
             $name: 'Minimum Step',
             $type: 'number',
             $writable: 'write',
             '?value': minStep
         });
-        this.children['minStep'].subscribe(value => {
-            this.characteristic.setProps({ minStep: value.value });
+        this.children['minStep'].subscribe(function (value) {
+            _this.characteristic.setProps({ minStep: value.value });
         });
         this.characteristic.setProps({
             minValue: minValue,
             maxValue: maxValue,
             minStep: minStep
         });
-    }
-}
+    };
+    return CharacteristicNode;
+}(DS.SimpleNode));
 exports.CharacteristicNode = CharacteristicNode;

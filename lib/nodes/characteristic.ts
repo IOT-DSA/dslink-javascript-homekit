@@ -1,6 +1,8 @@
 import DS = require('dslink');
 import HAP = require('hap-nodejs');
 
+import util = require('../util');
+
 export class CharacteristicNode extends DS.SimpleNode {
   characteristic: HAP.Characteristic;
   service: HAP.Service;
@@ -35,7 +37,7 @@ export class CharacteristicNode extends DS.SimpleNode {
 
     this.characteristic.value = this.characteristic.getDefaultValue();
 
-    this.configs = Object.assign(this.configs, {
+    this.configs = util.assign(this.configs, {
       $$perms: this.characteristic.props.perms
     });
 
@@ -62,7 +64,7 @@ export class CharacteristicNode extends DS.SimpleNode {
 
       if (validValues != null) {
         Object.keys(validValues).forEach(key => {
-          if (validValues[key] === value.toString()) {
+          if (validValues[key].toString() === value.toString()) {
             value = key;
           }
         });
