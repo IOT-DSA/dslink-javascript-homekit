@@ -20,7 +20,7 @@ var CharacteristicNode = (function (_super) {
             if (map.$$type === 'int' || map.$$type === 'number')
                 return parseFloat(type);
             if (map.$$type === 'bool')
-                return type === 'type';
+                return type.toString() === 'true';
             return type;
         };
         var validValues = map['?validValues'];

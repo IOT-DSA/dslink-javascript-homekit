@@ -16,11 +16,11 @@ export class CharacteristicNode extends DS.SimpleNode {
   load(map: any): any {
     super.load(map);
 
-    const convert = (type: string): any => {
+    const convert = (type: any): any => {
       if (map.$$type === 'int' || map.$$type === 'number')
         return parseFloat(type);
       if (map.$$type === 'bool')
-        return type === 'type';
+        return type.toString() === 'true';
       return type;
     };
     
