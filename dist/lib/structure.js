@@ -104,15 +104,26 @@ exports.defaultNodes = {
         $type: 'bool',
         '?value': false
     },
-    //* @Action restartBridge
-    //* @Is restartBridge
-    //* @Parent root
-    //*
-    //* Restarts the bridge accessory.
+    startBridge: {
+        $is: 'startBridge',
+        $name: 'Start Bridge',
+        $invokable: 'write',
+        $actionGroup: 'Bridge',
+        $actionGroupSubTitle: 'Start'
+    },
+    stopBridge: {
+        $is: 'stopBridge',
+        $name: 'Stop Bridge',
+        $invokable: 'write',
+        $actionGroup: 'Bridge',
+        $actionGroupSubTitle: 'Stop'
+    },
     restartBridge: {
         $is: 'restartBridge',
         $name: 'Restart Bridge',
-        $invokable: 'write'
+        $invokable: 'write',
+        $actionGroup: 'Bridge',
+        $actionGroupSubTitle: 'Restart'
     }
 };
 function accessoryStructure(displayName) {

@@ -1,7 +1,7 @@
 "use strict";
 var HAP = require("hap-nodejs");
 var state = require('./lib/state');
-var link = state.stateFactory.state.link();
+var link = state.link;
 link.init();
 link.connect().then(function (_) {
     HAP.init();

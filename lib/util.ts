@@ -1,6 +1,7 @@
 import os = require('os');
 
 // rather hacky, should PR later
+// unpublishes an accessory
 export function unpublishAccessory(acc: any): void {
   // stop advertising on mdns
   acc._advertiser.stopAdvertising();
@@ -19,6 +20,9 @@ export function unpublishAccessory(acc: any): void {
   acc.removeAllListeners();
 }
 
+// gets the mac address for use as the accessory's id
+// use a random generated address (hardcoded) if we can't find
+// a suitable address
 export function getMac(): string {
   const okayInterfaces: string[] = ['eth0', 'eth1', 'en0', 'en1'];
   const interfaces: any = os.networkInterfaces();
@@ -40,6 +44,8 @@ export function getMac(): string {
   return 'DC:FE:BA:AB:3F:27';
 }
 
+// polyfill for the ES6 function Object.assign
+// we still need full ES5 compatibility
 export function assign(dest, ...args) {
   var count = 0;
   var length = args.length;
@@ -55,32 +61,4 @@ export function assign(dest, ...args) {
   }
 
   return dest;
-}
-
-export class StateFactory<T extends Object> {
-  _state: Object;
-  state: T;
-
-  _values: Object;
-
-  constructor() {
-    this._state = {};
-    
-    this.state = <T>{};
-    
-    this._values = {};
-  }
-  
-  add(name: string, cb: () => any): void {
-    this._values[name] = cb;
-    
-    this.state[name] = () => this.get(name);
-  }
-  
-  get(name: string): any {  
-    if(this._state[name])
-      return this._state[name];
-      
-    return (this._state[name] = this._values[name]());
-  }
 }

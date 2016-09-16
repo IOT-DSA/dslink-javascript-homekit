@@ -15,11 +15,11 @@ var AccessoryNode = (function (_super) {
     AccessoryNode.prototype.load = function (map) {
         this.accessory = new HAP.Accessory(map.$name, map.$$uuid);
         _super.prototype.load.call(this, map);
-        state.stateFactory.state.bridge().addBridgedAccessory(this.accessory, false);
+        state.bridge.addBridgedAccessory(this.accessory, false);
     };
     AccessoryNode.prototype.onRemoving = function () {
         if (this.accessory != null) {
-            state.stateFactory.state.bridge().removeBridgedAccessory(this.accessory, false);
+            state.bridge.removeBridgedAccessory(this.accessory, false);
             this.accessory = null;
         }
         _super.prototype.onRemoving.call(this);

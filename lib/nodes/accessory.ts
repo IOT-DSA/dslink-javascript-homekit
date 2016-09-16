@@ -14,12 +14,12 @@ export class AccessoryNode extends DS.SimpleNode {
     this.accessory = new HAP.Accessory(map.$name, map.$$uuid);
     super.load(map);
     
-    state.stateFactory.state.bridge().addBridgedAccessory(this.accessory, false);
+    state.bridge.addBridgedAccessory(this.accessory, false);
   }
 
   onRemoving(): any {
     if (this.accessory != null) {
-      state.stateFactory.state.bridge().removeBridgedAccessory(this.accessory, false);
+      state.bridge.removeBridgedAccessory(this.accessory, false);
       this.accessory = null;
     }
 

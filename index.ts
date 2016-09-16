@@ -3,7 +3,7 @@ import HAP = require("hap-nodejs");
 
 import state = require('./lib/state');
 
-const link: DS.LinkProvider = state.stateFactory.state.link();
+const link: DS.LinkProvider = state.link;
 
 link.init();
 
