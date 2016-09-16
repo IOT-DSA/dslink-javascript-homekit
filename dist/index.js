@@ -1,12 +1,11 @@
 "use strict";
 var HAP = require("hap-nodejs");
-var store = require("./lib/store");
-var state = store.store.state;
-var link = state.link();
+var state = require('./lib/state');
+var link = state.stateFactory.state.link();
 link.init();
 link.connect().then(function (_) {
     HAP.init();
-    state.bridge();
+    state.startBridge();
     setInterval(function (_) {
         link.save();
     }, 1000 * 2.5);

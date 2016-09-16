@@ -25,15 +25,11 @@ npm install
 node dist/index.js --broker https://www.broker.com/conn
 ```
 
-### Structure
+Connecting to your new HomeKit device requires a special iOS app. Many generic
+HomeKit apps work, but we've had good success with *Ezzi Home*.
 
-###### Root Structure
-
-###### Accessory Structure
-
-###### Service Structure
-
-###### Characteristic Structure
+Unless you change it from the link, the link will display in HomeKit as
+*HomeKit + DSA*, and the pincode will be 465-46-465.
 
 ### License
 

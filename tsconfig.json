@@ -9,7 +9,7 @@
     "lib/nodes/accessory.ts",
     "lib/nodes/service.ts",
     "lib/nodes/characteristic.ts",
-    "lib/store.ts",
+    "lib/state.ts",
     "index.ts"
   ],
   "compilerOptions": {

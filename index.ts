@@ -1,17 +1,15 @@
 import DS = require('dslink');
 import HAP = require("hap-nodejs");
 
-import store = require("./lib/store");
+import state = require('./lib/state');
 
-const state = store.store.state;
-
-const link: DS.LinkProvider = state.link();
+const link: DS.LinkProvider = state.stateFactory.state.link();
 
 link.init();
 
 link.connect().then(_ => {
   HAP.init();
-  state.bridge();
+  state.startBridge();
   
   setInterval(_ => {
     link.save();

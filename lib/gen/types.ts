@@ -866,13 +866,6 @@ export const types: any = {
         }
     },
     "services": {
-        "Accessory Information": {
-            "uuid": "0000003E-0000-1000-8000-0026BB765291",
-            "className": "AccessoryInformation",
-            "name": "Accessory Information",
-            "required": ["Identify", "Manufacturer", "Model", "Name", "Serial Number"],
-            "optional": ["Firmware Revision", "Hardware Revision", "Software Revision"]
-        },
         "Air Quality Sensor": {
             "uuid": "0000008D-0000-1000-8000-0026BB765291",
             "className": "AirQualitySensor",

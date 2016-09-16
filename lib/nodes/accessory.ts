@@ -1,7 +1,7 @@
 import DS = require('dslink');
 import HAP = require('hap-nodejs');
 
-import store = require('../store');
+import state = require('../state');
 
 export class AccessoryNode extends DS.SimpleNode {
   accessory: HAP.Accessory;
@@ -11,22 +11,15 @@ export class AccessoryNode extends DS.SimpleNode {
   }
 
   load(map: any): any {
-    store.accessories.push((this.accessory = new HAP.Accessory(map.$name, map.$$uuid)));
-    
+    this.accessory = new HAP.Accessory(map.$name, map.$$uuid);
     super.load(map);
     
-    if (store.store.has('bridge')) {
-      store.store.state.bridge().addBridgedAccessory(this.accessory, false);
-    }
+    state.stateFactory.state.bridge().addBridgedAccessory(this.accessory, false);
   }
 
   onRemoving(): any {
     if (this.accessory != null) {
-      store.accessories.splice(store.accessories.indexOf(this.accessory));
-
-      if (store.store.has('bridge')) {
-        store.store.state.bridge().removeBridgedAccessory(this.accessory, false);
-      }
+      state.stateFactory.state.bridge().removeBridgedAccessory(this.accessory, false);
       this.accessory = null;
     }
 

@@ -1,15 +1,37 @@
 "use strict";
+var os = require('os');
 // rather hacky, should PR later
 function unpublishAccessory(acc) {
     // stop advertising on mdns
     acc._advertiser.stopAdvertising();
     acc._advertiser = null;
     // stop tcp server
+    clearInterval(acc._server._keepAliveTimerID);
+    acc._server._httpServer._connections.forEach(function (s) { return s._onServerSocketClose(); });
+    acc._server._httpServer._tcpServer.removeAllListeners();
     acc._server._httpServer._tcpServer.close();
     acc._server.removeAllListeners();
     acc._server = null;
+    acc.removeAllListeners();
 }
 exports.unpublishAccessory = unpublishAccessory;
+function getMac() {
+    var okayInterfaces = ['eth0', 'eth1', 'en0', 'en1'];
+    var interfaces = os.networkInterfaces();
+    okayInterfaces.forEach(function (okay) {
+        if (interfaces[okay]) {
+            var list_1 = interfaces[okay];
+            if (list_1.length > 0 && list_1[list_1.length - 1].mac)
+                return list_1[list_1.length - 1].mac.toUpperCase();
+        }
+    });
+    var keys = Object.keys(interfaces);
+    var list = interfaces[keys[keys.length - 1]];
+    if (list.length > 0 && list[list.length - 1].mac && list[list.length - 1].mac != '00:00:00:00:00:00')
+        return list[list.length - 1].mac.toUpperCase();
+    return 'DC:FE:BA:AB:3F:27';
+}
+exports.getMac = getMac;
 function assign(dest) {
     var args = [];
     for (var _i = 1; _i < arguments.length; _i++) {
@@ -28,34 +50,22 @@ function assign(dest) {
     return dest;
 }
 exports.assign = assign;
-var LifecycleStore = (function () {
-    function LifecycleStore() {
+var StateFactory = (function () {
+    function StateFactory() {
         this._state = {};
         this.state = {};
-        this._when = {};
-        this._whenDelete = {};
+        this._values = {};
     }
-    LifecycleStore.prototype.when = function (name, cb) {
+    StateFactory.prototype.add = function (name, cb) {
         var _this = this;
-        this._when[name] = cb;
+        this._values[name] = cb;
         this.state[name] = function () { return _this.get(name); };
     };
-    LifecycleStore.prototype.whenDelete = function (name, cb) {
-        this._whenDelete[name] = cb;
-    };
-    LifecycleStore.prototype.get = function (name) {
+    StateFactory.prototype.get = function (name) {
         if (this._state[name])
             return this._state[name];
-        return (this._state[name] = this._when[name]());
+        return (this._state[name] = this._values[name]());
     };
-    LifecycleStore.prototype.has = function (name) {
-        return !!this._state[name];
-    };
-    LifecycleStore.prototype.deleteKey = function (name) {
-        if (this._whenDelete[name])
-            this._whenDelete[name](this._state[name]);
-        delete this._state[name];
-    };
-    return LifecycleStore;
+    return StateFactory;
 }());
-exports.LifecycleStore = LifecycleStore;
+exports.StateFactory = StateFactory;

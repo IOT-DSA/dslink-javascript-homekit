@@ -47,10 +47,22 @@ const enumPrefabServices = DS.buildEnumType(Object.keys(types.types.services).fi
     t => t.toLowerCase().indexOf('bridg') < 0 && t.toLowerCase().indexOf('tunnel') < 0));
 
 export const defaultNodes: Object = {
+  //* @Node accessories
+  //* @Parent root
+  //*
+  //* A node that contains all of the HomeKit accessories added by the link.
   accessories: {
     $is: 'node',
     $name: 'Accessories'
   },
+  //* @Action addAccessory
+  //* @Is addAccessory
+  //* @Parent root
+  //*
+  //* Adds a HomeKit accessory to the link. This accessory can be found in Accessories,
+  //* and should be viewable in HomeKit after connecting to the default bridge accessory.
+  //*
+  //* @Param displayName string Name that is used for the accessory by the link and HomeKit.
   addAccessory: {
     $is: 'addAccessory',
     $name: 'Add Accessory',
@@ -62,6 +74,12 @@ export const defaultNodes: Object = {
       }
     ]
   },
+  //* @Node name
+  //* @Parent root
+  //*
+  //* Name for the bridge accessory. By default, this value is 'HomeKit + DSA'.
+  //*
+  //* @Value string write
   name: {
     $is: 'node',
     $name: 'Bridge Name',
@@ -69,6 +87,12 @@ export const defaultNodes: Object = {
     $writable: 'write',
     '?value': 'HomeKit + DSA'
   },
+  //* @Node pincode
+  //* @Parent root
+  //*
+  //* Pin-code for the bridge accessory. By default, this value is '465-46-465'.
+  //*
+  //* @Value string write
   pincode: {
     $is: 'node',
     $name: 'Bridge Pincode',
@@ -76,20 +100,26 @@ export const defaultNodes: Object = {
     $writable: 'write',
     '?value': '465-46-465'
   },
+  //* @Node started
+  //* @Parent root
+  //*
+  //* Indicates if the bridge accessory is currently running.
+  //*
+  //* @Value bool
   started: {
     $is: 'node',
     $name: 'Is Bridge Started',
     $type: 'bool',
     '?value': false
   },
-  startBridge: {
-    $is: 'startBridge',
-    $name: 'Start Bridge',
-    $invokable: 'write'
-  },
-  stopBridge: {
-    $is: 'stopBridge',
-    $name: 'Stop Bridge',
+  //* @Action restartBridge
+  //* @Is restartBridge
+  //* @Parent root
+  //*
+  //* Restarts the bridge accessory.
+  restartBridge: {
+    $is: 'restartBridge',
+    $name: 'Restart Bridge',
     $invokable: 'write'
   }
 };

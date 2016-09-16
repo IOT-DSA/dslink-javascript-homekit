@@ -13,11 +13,46 @@ interface _State {
   bridge?: () => HAP.Bridge;
 }
 
-export const accessories: HAP.Accessory[] = [];
+export const stateFactory: util.StateFactory<_State> = new util.StateFactory<_State>();
 
-export const store: util.LifecycleStore<_State> = new util.LifecycleStore<_State>();
+export function startBridge() {
+  const link = stateFactory.state.link();
+  const bridge = stateFactory.state.bridge();
 
-store.when('link', () => {
+  const name: string = link.val('/name');
+  const mac: string = util.getMac();
+
+  bridge.displayName = name;
+  bridge.UUID = HAP.uuid.generate(mac);
+
+  bridge.getService(HAP.Service.AccessoryInformation)
+    .setCharacteristic(HAP.Characteristic.Name, name);
+
+  console.log('HomeKit Server Started!');
+  console.log(`ID (should be MAC address): ${mac}`);
+  console.log(`Pincode: ${link.val('/pincode')}`);
+
+  bridge.publish({
+    username: mac,
+    port: 51826,
+    pincode: link.val('/pincode'),
+    category: HAP.Accessory.Categories.BRIDGE
+  });
+  
+  link.val('/started', true);
+}
+
+export function stopBridge() {
+  const link = stateFactory.state.link();
+  const bridge = stateFactory.state.bridge();
+
+  util.unpublishAccessory(bridge);
+
+  console.log('HomeKit Server Stopped!');
+  link.val('/started', false);
+}
+
+stateFactory.add('link', () => {
   const link = new DS.LinkProvider(process.argv.slice(2), 'HomeKit-', {
     defaultNodes: structure.defaultNodes,
     profiles: {
@@ -36,18 +71,10 @@ store.when('link', () => {
         const s = (<service.ServiceNode>provider.getNode(parentPath)).service;
         return new characteristic.CharacteristicNode(path, provider, s);
       },
-      startBridge(path: string, provider?: DS.SimpleNodeProvider) {
+      restartBridge(path: string, provider?: DS.SimpleNodeProvider) {
         return new DS.SimpleActionNode(path, provider, _ => {
-          if (link.val('/started'))
-            return;
-          store.state.bridge();
-        });
-      },
-      stopBridge(path: string, provider?: DS.SimpleNodeProvider) {
-        return new DS.SimpleActionNode(path, provider, _ => {
-          if (!link.val('/started'))
-            return;
-          store.deleteKey('bridge');
+          stopBridge();
+          startBridge();
         });
       },
       addAccessory(path: string, provider?: DS.SimpleNodeProvider) {
@@ -110,27 +137,5 @@ store.when('link', () => {
   return link;
 });
 
-store.when('bridge', () => {
-  const link = store.state.link();
-  const name: string = link.val('/name');
-
-  const bridge = new HAP.Bridge(name, HAP.uuid.generate(name));
-  console.log(link.val('/pincode'));
-
-  bridge.publish({
-    username: 'DC:FE:BA:AB:3F:27',
-    port: 51826,
-    pincode: link.val('/pincode'),
-    category: HAP.Accessory.Categories.BRIDGE
-  });
-  
-  bridge.addBridgedAccessories(accessories);
-
-  link.val('/started', true);
-  return bridge;
-});
-
-store.whenDelete('bridge', (bridge: HAP.Bridge) => {
-  util.unpublishAccessory(bridge);
-  store.state.link().val('/started', false);
-});
+stateFactory.add('bridge', () => new HAP.Bridge('DSA Temporary Name',
+  HAP.uuid.generate("DSA Temporary Name")));

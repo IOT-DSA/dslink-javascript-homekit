@@ -6,25 +6,20 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var DS = require('dslink');
 var HAP = require('hap-nodejs');
-var store = require('../store');
+var state = require('../state');
 var AccessoryNode = (function (_super) {
     __extends(AccessoryNode, _super);
     function AccessoryNode(path, provider) {
         _super.call(this, path, provider);
     }
     AccessoryNode.prototype.load = function (map) {
-        store.accessories.push((this.accessory = new HAP.Accessory(map.$name, map.$$uuid)));
+        this.accessory = new HAP.Accessory(map.$name, map.$$uuid);
         _super.prototype.load.call(this, map);
-        if (store.store.has('bridge')) {
-            store.store.state.bridge().addBridgedAccessory(this.accessory, false);
-        }
+        state.stateFactory.state.bridge().addBridgedAccessory(this.accessory, false);
     };
     AccessoryNode.prototype.onRemoving = function () {
         if (this.accessory != null) {
-            store.accessories.splice(store.accessories.indexOf(this.accessory));
-            if (store.store.has('bridge')) {
-                store.store.state.bridge().removeBridgedAccessory(this.accessory, false);
-            }
+            state.stateFactory.state.bridge().removeBridgedAccessory(this.accessory, false);
             this.accessory = null;
         }
         _super.prototype.onRemoving.call(this);

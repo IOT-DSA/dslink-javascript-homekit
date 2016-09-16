@@ -65,6 +65,8 @@ declare namespace __Hap {
   }
 
   class Characteristic extends _EventEmitter {
+    static Name: Characteristic;
+
     static Formats: _CharacteristicFormats;
     static Units: _CharacteristicUnits;
     static Perms: _CharacteristicPerms;
@@ -86,6 +88,8 @@ declare namespace __Hap {
   }
 
   class Service extends _EventEmitter {
+    static AccessoryInformation: Service;
+
     displayName: string;
     UUID: string;
     subtype: string;
@@ -104,7 +108,7 @@ declare namespace __Hap {
     getCharacteristicByIID(iid: string): Characteristic;
 
     testCharacteristic(name: string): boolean;
-    setCharacteristic(name: string, value: any): Service;
+    setCharacteristic(name: string | Characteristic, value: any): Service;
 
     toHAP(opt?: any): string;
   }
@@ -151,7 +155,7 @@ declare namespace __Hap {
     addService(service: Service): Service;
     removeService(service: Service): void;
 
-    getService(name: string): Service;
+    getService(name: string | Service): Service;
 
     updateReachability(reachable: boolean): void;
 
