@@ -31,6 +31,10 @@ function stopBridge() {
     exports.link.val('/started', false);
 }
 exports.stopBridge = stopBridge;
+exports.bridge = (function () {
+    HAP.init();
+    return new HAP.Bridge('DSA Temporary Name', HAP.uuid.generate("DSA Temporary Name"));
+})();
 exports.link = new DS.LinkProvider(process.argv.slice(2), 'HomeKit-', {
     defaultNodes: structure.defaultNodes,
     profiles: {
@@ -112,4 +116,3 @@ exports.link = new DS.LinkProvider(process.argv.slice(2), 'HomeKit-', {
         }
     }
 });
-exports.bridge = new HAP.Bridge('DSA Temporary Name', HAP.uuid.generate("DSA Temporary Name"));

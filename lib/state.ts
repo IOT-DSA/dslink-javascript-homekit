@@ -39,6 +39,13 @@ export function stopBridge() {
   link.val('/started', false);
 }
 
+export const bridge: HAP.Bridge = (() => {
+  HAP.init();
+
+  return new HAP.Bridge('DSA Temporary Name',
+      HAP.uuid.generate("DSA Temporary Name"));
+})();
+
 export const link: DS.LinkProvider = new DS.LinkProvider(process.argv.slice(2), 'HomeKit-', {
   defaultNodes: structure.defaultNodes,
   profiles: {
@@ -133,6 +140,3 @@ export const link: DS.LinkProvider = new DS.LinkProvider(process.argv.slice(2), 
     }
   }
 });
-
-export const bridge: HAP.Bridge = new HAP.Bridge('DSA Temporary Name',
-    HAP.uuid.generate("DSA Temporary Name"));

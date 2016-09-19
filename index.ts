@@ -8,7 +8,6 @@ const link: DS.LinkProvider = state.link;
 link.init();
 
 link.connect().then(_ => {
-  HAP.init();
   state.startBridge();
   
   setInterval(_ => {

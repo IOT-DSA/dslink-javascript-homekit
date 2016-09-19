@@ -20,7 +20,7 @@ export class CharacteristicNode extends DS.SimpleNode {
       if (map.$$type === 'int' || map.$$type === 'number')
         return parseFloat(type);
       if (map.$$type === 'bool')
-        return type.toString() === 'true';
+        return !!type && (type.toString() === 'true' || type === 1);
       return type;
     };
     
