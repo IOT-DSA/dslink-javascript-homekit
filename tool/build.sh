@@ -3,4 +3,4 @@ set -e
 rm -rf .git
 touch .buildscript
 rm -rf ../../files/dslink-javascript-homekit.zip
-zip -r ../../files/dslink-javascript-homekit.zip *
+zip -x '.git/*' -r ../../files/dslink-javascript-homekit.zip .
