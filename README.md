@@ -8,6 +8,10 @@ that mimic those available in the HAP HomeKit specification.
 
 *In development. Link is feature complete but bugs may occur.*
 
+### Documentation
+
+Documentation for the DSLink can be found in api.md.
+
 ### Quick Start
 
 ###### Automatic installation:

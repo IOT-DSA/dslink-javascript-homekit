@@ -1,12 +1,8 @@
 "use strict";
 var os = require('os');
-// rather hacky, should PR later
-// unpublishes an accessory
 function unpublishAccessory(acc) {
-    // stop advertising on mdns
     acc._advertiser.stopAdvertising();
     acc._advertiser = null;
-    // stop tcp server
     clearInterval(acc._server._keepAliveTimerID);
     acc._server._httpServer._connections.forEach(function (s) { return s._onServerSocketClose(); });
     acc._server._httpServer._tcpServer.removeAllListeners();
@@ -16,9 +12,6 @@ function unpublishAccessory(acc) {
     acc.removeAllListeners();
 }
 exports.unpublishAccessory = unpublishAccessory;
-// gets the mac address for use as the accessory's id
-// use a random generated address (hardcoded) if we can't find
-// a suitable address
 function getMac() {
     var okayInterfaces = ['eth0', 'eth1', 'en0', 'en1'];
     var interfaces = os.networkInterfaces();
@@ -36,8 +29,6 @@ function getMac() {
     return 'DC:FE:BA:AB:3F:27';
 }
 exports.getMac = getMac;
-// polyfill for the ES6 function Object.assign
-// we still need full ES5 compatibility
 function assign(dest) {
     var args = [];
     for (var _i = 1; _i < arguments.length; _i++) {
