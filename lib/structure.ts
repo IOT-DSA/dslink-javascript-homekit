@@ -112,6 +112,11 @@ export const defaultNodes: Object = {
     $type: 'bool',
     '?value': false
   },
+  //* @Action startBridge
+  //* @Is startBridge
+  //* @Parent root
+  //*
+  //* Starts the HomeKit bridge if it was not already running.
   startBridge: {
     $is: 'startBridge',
     $name: 'Start Bridge',
@@ -119,6 +124,11 @@ export const defaultNodes: Object = {
     $actionGroup: 'Bridge',
     $actionGroupSubTitle: 'Start'
   },
+  //* @Action stopBridge
+  //* @Is stopBridge
+  //* @Parent root
+  //*
+  //* Stops the HomeKit bridge if it's currently running.
   stopBridge: {
     $is: 'stopBridge',
     $name: 'Stop Bridge',
@@ -126,6 +136,11 @@ export const defaultNodes: Object = {
     $actionGroup: 'Bridge',
     $actionGroupSubTitle: 'Stop'
   },
+  //* @Action restartBridge
+  //* @Is restartBridge
+  //* @Parent root
+  //*
+  //* Stops and then starts the HomeKit bridge, regardless of it's current state.
   restartBridge: {
     $is: 'restartBridge',
     $name: 'Restart Bridge',
@@ -137,13 +152,43 @@ export const defaultNodes: Object = {
 
 export function accessoryStructure(displayName: string): any {
   return {
+    //* @Node
+    //* @MetaType AccessoryNode
+    //* @Is accessory
+    //* @Parent accessories
+    //*
+    //* The top level of a device in HomeKit.
+    //*
+    //* An accessory in HomeKit is the top level of a device that contains
+    //* services and characteristics to provide functionality.
     $is: 'accessory',
     $name: displayName,
     $$uuid: HAP.uuid.generate(displayName),
+    //* @Node services
+    //* @Parent AccessoryNode
+    //*
+    //* A node that contains all of the accessory's services.
     services: {
       $is: 'node',
       $name: 'Services'
     },
+    //* @Action addServicePrefab
+    //* @Is addServicePrefab
+    //* @Parent AccessoryNode
+    //*
+    //* Adds a service to the node from a set of Apple-defined prefabs.
+    //*
+    //* Adds a service to the node from a set of Apple-defined prefabs. These
+    //* prefabs are given special priority and functionality within various
+    //* HomeKit apps and Siri. In most cases, this should be used over the
+    //* regular Add Service action.
+    //*
+    //* @Param displayName string The display name of the service.
+    //* @Param type enum The type of prefab to use. This includes, but is not
+    //* limited to, types such as a thermostat, garage door, or lightbulb.
+    //* @Param includeOptionalCharacteristics bool Determines if the service
+    //* should include characteristics allowed by the Apple prefab but not
+    //* required.
     addServicePrefab: {
       $is: 'addServicePrefab',
       $name: 'Add Service Prefab',
@@ -166,6 +211,18 @@ export function accessoryStructure(displayName: string): any {
         }
       ]
     },
+    //* @Action addService
+    //* @Is addService
+    //* @Parent AccessoryNode
+    //*
+    //* Adds a service to the node.
+    //*
+    //* Adds a service to the node. This action should only be used in rare
+    //* cases, as the Home app or Siri may not be able to comprehend the
+    //* function of your service. In most cases, the Add Service Prefab action
+    //* should be used instead.
+    //*
+    //* @Param displayName string The display name of the service.
     addService: {
       $is: 'addService',
       $name: 'Add Service',
@@ -179,6 +236,11 @@ export function accessoryStructure(displayName: string): any {
         }
       ]
     },
+    //* @Action remove
+    //* @Is remove
+    //* @Parent AccessoryNode
+    //*
+    //* Removes this accessory from the HomeKit bridge.
     remove: {
       $is: 'remove',
       $name: 'Remove Accessory',

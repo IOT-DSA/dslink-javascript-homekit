@@ -39,22 +39,10 @@ var enumUnits = DS.buildEnumType([
 ]);
 var enumPrefabServices = DS.buildEnumType(Object.keys(types.types.services).filter(function (t) { return t.toLowerCase().indexOf('bridg') < 0 && t.toLowerCase().indexOf('tunnel') < 0; }));
 exports.defaultNodes = {
-    //* @Node accessories
-    //* @Parent root
-    //*
-    //* A node that contains all of the HomeKit accessories added by the link.
     accessories: {
         $is: 'node',
         $name: 'Accessories'
     },
-    //* @Action addAccessory
-    //* @Is addAccessory
-    //* @Parent root
-    //*
-    //* Adds a HomeKit accessory to the link. This accessory can be found in Accessories,
-    //* and should be viewable in HomeKit after connecting to the default bridge accessory.
-    //*
-    //* @Param displayName string Name that is used for the accessory by the link and HomeKit.
     addAccessory: {
         $is: 'addAccessory',
         $name: 'Add Accessory',
@@ -66,12 +54,6 @@ exports.defaultNodes = {
             }
         ]
     },
-    //* @Node name
-    //* @Parent root
-    //*
-    //* Name for the bridge accessory. By default, this value is 'HomeKit + DSA'.
-    //*
-    //* @Value string write
     name: {
         $is: 'node',
         $name: 'Bridge Name',
@@ -79,12 +61,6 @@ exports.defaultNodes = {
         $writable: 'write',
         '?value': 'HomeKit + DSA'
     },
-    //* @Node pincode
-    //* @Parent root
-    //*
-    //* Pin-code for the bridge accessory. By default, this value is '465-46-465'.
-    //*
-    //* @Value string write
     pincode: {
         $is: 'node',
         $name: 'Bridge Pincode',
@@ -92,12 +68,6 @@ exports.defaultNodes = {
         $writable: 'write',
         '?value': '465-46-465'
     },
-    //* @Node started
-    //* @Parent root
-    //*
-    //* Indicates if the bridge accessory is currently running.
-    //*
-    //* @Value bool
     started: {
         $is: 'node',
         $name: 'Is Bridge Started',
