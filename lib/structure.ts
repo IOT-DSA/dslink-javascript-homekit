@@ -157,9 +157,9 @@ export function accessoryStructure(displayName: string): any {
     //* @Is accessory
     //* @Parent accessories
     //*
-    //* The top level of a device in HomeKit.
+    //* The top level structure in HomeKit.
     //*
-    //* An accessory in HomeKit is the top level of a device that contains
+    //* An accessory in HomeKit is the top level structure that contains
     //* services and characteristics to provide functionality.
     $is: 'accessory',
     $name: displayName,
@@ -236,7 +236,7 @@ export function accessoryStructure(displayName: string): any {
         }
       ]
     },
-    //* @Action remove
+    //* @Action removeAccessory
     //* @Is remove
     //* @Parent AccessoryNode
     //*
@@ -251,14 +251,42 @@ export function accessoryStructure(displayName: string): any {
 
 export function serviceStructure(displayName: string): any {
   return {
+    //* @Node
+    //* @MetaType ServiceNode
+    //* @Is service
+    //* @Parent services
+    //*
+    //* A service is the layer in HomeKit that provides functionality to accessories.
+    //*
+    //* A service is the layer in HomeKit that provides functionality to accessories.
+    //* Services are responsible for what you'd most likely consider devices,
+    //* like the ability to be a door, thermostat, etc.
     $is: 'service',
     $name: displayName,
     $$uuid: HAP.uuid.generate(displayName),
+    //* @Action removeService
+    //* @Is remove
+    //* @Parent ServiceNode
+    //*
+    //* Removes this service from the parent accessory.
     remove: {
       $is: 'remove',
       $name: 'Remove Service',
       $invokable: 'write'
     },
+    //* @Action addCharacteristic
+    //* @Is addCharacteristic
+    //* @Parent ServiceNode
+    //*
+    //* Adds a characteristic to the node.
+    //*
+    //* @Param name string The name of the characteristic.
+    //* @Param format enum[BOOL,INT,FLOAT,STRING,UINT8,UINT16,UINT32,UINT64] The
+    //* HomeKit data format of the new characteristic.
+    //* @Param unit enum[NONE,CELSIUS,PERCENTAGE,ARC_DEGREE,LUX,SECONDS] The
+    //* data unit that used by an iOS device to interpret the new characteristic.
+    //* @Param writable bool Determines if a HomeKit app can change the value
+    //* of the characteristic.
     addCharacteristic: {
       $is: 'addCharacteristic',
       $name: 'Add Characteristic',
@@ -292,6 +320,16 @@ export function characteristicStructure(displayName: string, format: string, uni
   const dsaFormat = hapToDSAFormats[format] || 'dynamic';
   
   const map = {
+    //* @Node
+    //* @MetaType CharacteristicNode
+    //* @Is characteristic
+    //* @Parent ServiceNode
+    //*
+    //* A characteristic is a data point in HomeKit.
+    //*
+    //* A characteristic is a data point in HomeKit. Examples of these can
+    //* be specific things like temperature, if a door is open, if a fan is
+    //* running, etc.
     $is: 'characteristic',
     $name: displayName,
     $$uuid: HAP.uuid.generate(displayName),
@@ -302,18 +340,35 @@ export function characteristicStructure(displayName: string, format: string, uni
     $writable: 'write',
     '?value': defaultValues[dsaFormat] != null ? defaultValues[dsaFormat] : '',
     '?writable': writable,
+    //* @Node format
+    //* @Parent CharacteristicNode
+    //*
+    //* The HomeKit data format of the characteristic.
+    //*
+    //* @Value enum[BOOL,INT,FLOAT,STRING,UINT8,UINT16,UINT32,UINT64]
     format: {
       $is: 'node',
       $name: 'Format',
       $type: enumFormats,
       '?value': format
     },
+    //* @Node unit
+    //* @Parent CharacteristicNode
+    //*
+    //* The data unit that used by an iOS device to interpret the characteristic.
+    //*
+    //* @Value enum[NONE,CELSIUS,PERCENTAGE,ARC_DEGREE,LUX,SECONDS]
     unit: {
       $is: 'node',
       $name: 'Unit',
       $type: enumUnits,
       '?value': unit
     },
+    //* @Action removeCharacteristic
+    //* @Is remove
+    //* @Parent CharacteristicNode
+    //*
+    //* Removes this characteristic from the parent servuce.
     removeCharacteristic: {
       $is: 'remove',
       $name: 'Remove Characteristic',
@@ -323,6 +378,15 @@ export function characteristicStructure(displayName: string, format: string, uni
 
   if (dsaFormat === 'number' || dsaFormat === 'int') {
     util.assign(map, {
+      //* @Action addBounds
+      //* @Is addBounds
+      //* @Parent CharacteristicNode
+      //*
+      //* Bounds a characteristic in HomeKit that has a numerical format.
+      //*
+      //* @Param minValue number The minimum value.
+      //* @Param maxValue number The maximum value.
+      //* @Param minStep number The minimum step value.
       addBounds: {
         $is: 'addBounds',
         $name: 'Add Bounds',
