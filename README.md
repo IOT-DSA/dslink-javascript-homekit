@@ -10,7 +10,7 @@ that mimic those available in the HAP HomeKit specification.
 
 ### Documentation
 
-Documentation for the DSLink can be found in api.md.
+Documentation for the DSLink can be found in **api.md**.
 
 ### Quick Start
 
